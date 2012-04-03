@@ -27,28 +27,33 @@
 
 // **** HELPER FUNCTIONS - DON'T TOUCH!
 
-    // via http://www.ps-scripts.com/bb/viewtopic.php?p=343
+    // Takes a snapshot
     function takeSnapshot() { 
-       var id686 = charIDToTypeID( "Mk  " ); 
        var desc153 = new ActionDescriptor(); 
-       var id687 = charIDToTypeID( "null" ); 
        var ref119 = new ActionReference(); 
-       var id688 = charIDToTypeID( "SnpS" ); 
-       ref119.putClass( id688 ); 
-       desc153.putReference( id687, ref119 ); 
-       var id689 = charIDToTypeID( "From" ); 
+       ref119.putClass(charIDToTypeID("SnpS")); // Snapshot
+       desc153.putReference(charIDToTypeID("null"), ref119 ); 
        var ref120 = new ActionReference(); 
-       var id690 = charIDToTypeID( "HstS" ); 
-       var id691 = charIDToTypeID( "CrnH" ); 
-       ref120.putProperty( id690, id691 ); 
-       desc153.putReference( id689, ref120 ); 
-       executeAction( id686, desc153, DialogModes.NO ); 
+       ref120.putProperty(charIDToTypeID("HstS"), charIDToTypeID("CrnH") ); // Historystate, CurrentHistorystate
+       desc153.putReference(charIDToTypeID("From"), ref120 ); // From Current Historystate
+       executeAction(charIDToTypeID("Mk  "), desc153, DialogModes.NO ); 
     }
 
+    // deletes the current active snapshot
+    function deleteCurrentSnapshot() {
+        var ref = new ActionReference();
+        ref.putProperty(charIDToTypeID("HstS"), charIDToTypeID("CrnH"));
+        var desc = new ActionDescriptor();
+        desc.putReference(charIDToTypeID("null"), ref );
+        executeAction(charIDToTypeID("Dlt "), desc, DialogModes.NO );
+    }
+
+    // reversts to a given snapshot
     function revertToSnapshot(doc, snapshotID) {
       doc.activeHistoryState = doc.historyStates[snapshotID];
     }
 
+    // get id of the last snapshot
     function getLastSnapshotID(doc) { 
        var hsObj = doc.historyStates; 
        var hsLength = hsObj.length; 
@@ -60,6 +65,7 @@
        }       
     }
 
+    // get all visible layers
     function getVisibleLayers(doc) {
         var tempArray = new Array();
         for (var i = 0; i < doc.layers.length; i++)
@@ -70,6 +76,7 @@
         return tempArray;
     }
 
+    // check if a layer is empty
     function isLayerEmpty(doc, layer) {
       if (!doc) {
         doc = app.activeDocument;
@@ -80,6 +87,7 @@
       return parseInt(layer.bounds.toString().replace(/\D/g,"")) == 0;
     }
 
+    // check if visibile layers are empty
     function visibleLayersEmpty(doc) {
         var bool = true;
         if (!doc) {
@@ -128,9 +136,11 @@
             maxZoomLevel++;
         } while (Math.pow(2, maxZoomLevel) < maxTileDim);
 
-        // Take initial snapshot. We'll go back to this once we're finished to leave the document in the state we started
-        takeSnapshot();
+        // Store initial state
         var InitialSnapshotID = getLastSnapshotID(curDoc);
+        
+        // keep track of all other snapshots
+        var snapshots = [];
 
         // Resize to a square version & center image - this way we get an image size that's easily tileable (512, 1028, 2048, 4096, ...)
         var bgColorHex = new SolidColor();
@@ -153,9 +163,9 @@
                 curDoc.resizeImage(curDoc.width.value * 0.5, curDoc.height.value * 0.5);
             }
             
-            // Take a snapshot for this zoom level
+            // Take a snapshot for this zoom level and store it
             takeSnapshot();
-            var ZoomLevelSnapshotID = getLastSnapshotID(curDoc);
+            snapshots.push(getLastSnapshotID(curDoc));
             
             // Calculate the number of tiles we'll need
             var xTiles = parseInt(curDoc.width.value, 10) / TILE_SIZE; // num tiles on the x axis
@@ -225,7 +235,7 @@
                 }
             
                 // Revert to zoom snapshot
-                revertToSnapshot(curDoc, ZoomLevelSnapshotID);
+                revertToSnapshot(curDoc, snapshots[snapshots.length-1]);
 
                 // Move to next tile in column
                 tileY += 1;
@@ -236,9 +246,19 @@
             ZoomLevel--;
             
         }
+    
+        // Loop all snapshots we took and delete them
+        do {
+            revertToSnapshot(curDoc, snapshots[snapshots.length-1]);
+            deleteCurrentSnapshot();
+            snapshots.pop();
+        } while (snapshots.length > 0);
 
-        // Revert to first snapshot (before we started cutting tiles)
+        // Revert to initial state (before we started cutting tiles)
         revertToSnapshot(curDoc, InitialSnapshotID);
+        
+        // Delete all other states
+        app.purge(PurgeTarget.HISTORYCACHES);
         
         // Restore application preferences
         app.preferences.rulerUnits = startRulerUnits;
