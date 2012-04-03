@@ -168,30 +168,30 @@
             snapshots.push(getLastSnapshotID(curDoc));
             
             // Calculate the number of tiles we'll need
-            var xTiles = parseInt(curDoc.width.value, 10) / TILE_SIZE; // num tiles on the x axis
-            var yTiles = parseInt(curDoc.height.value, 10) / TILE_SIZE; // num tiles on the y axis
-            var TotalTiles = xTiles * yTiles; // total tiles (numX * numY)
+            var numTilesX = parseInt(curDoc.width.value, 10) / TILE_SIZE; // num tiles on the x axis
+            var numTilesY = parseInt(curDoc.height.value, 10) / TILE_SIZE; // num tiles on the y axis
+            var numTilesTotal = numTilesX * numTilesY; // total tiles (numTilesX * numTilesY)
             
             // Counters to track which x value and which y value we are on in our image tile grid
-            var tileX = 0;
-            var tileY = 0;
+            var curTileX = 0;
+            var curTileY = 0;
             
             // Cut 'em up
             // For each tile we need to make, we repeat each step in this loop
-            for (n = 1; n < TotalTiles + 1; n++)
+            for (n = 1; n < numTilesTotal + 1; n++)
             {            
                 // We cut up tiles column by column
                 // I.E. we cut up all the tiles for a given x value before moving on to the next x value.
                 // We do this by checking if the y value we are on is the last tile in a column 
                 // We compare our y counter to our total y number of Tiles, if they are the same is we do the following
-                if (parseInt(tileY, 10) == parseInt(yTiles, 10))
+                if (parseInt(curTileY, 10) == parseInt(numTilesY, 10))
                 {   
-                    tileX += 1; // move to next column
-                    tileY = 0; // start back at the top
+                    curTileX += 1; // move to next column
+                    curTileY = 0; // start back at the top
                 }
                 
                 // Crop out needed square tile           
-                curDoc.crop(Array(tileX * TILE_SIZE, tileY * TILE_SIZE, tileX * TILE_SIZE + TILE_SIZE, tileY * TILE_SIZE + TILE_SIZE));
+                curDoc.crop(Array(curTileX * TILE_SIZE, curTileY * TILE_SIZE, curTileX * TILE_SIZE + TILE_SIZE, curTileY * TILE_SIZE + TILE_SIZE));
                 
                 if (!visibleLayersEmpty(curDoc))
                 {
@@ -200,7 +200,7 @@
                     if (saveGIF)
                     {
                         //Set path to file and file name
-                        saveFile = new File(targetPath + ZoomLevel + "_" + tileX + "_" + tileY + ".gif");    
+                        saveFile = new File(targetPath + ZoomLevel + "_" + curTileX + "_" + curTileY + ".gif");    
                         //Set save options
                         gifSaveOptions = new GIFSaveOptions();
                         gifSaveOptions.colors = 64;
@@ -215,7 +215,7 @@
                     if (savePNG)
                     {
                         //Set path to file and file name
-                        saveFile = new File(targetPath + ZoomLevel + "_" + tileX + "_" + tileY + ".png");    
+                        saveFile = new File(targetPath + ZoomLevel + "_" + curTileX + "_" + curTileY + ".png");    
                         pngSaveOptions = new PNGSaveOptions();
                         pngSaveOptions.interlaced = 0;
                         curDoc.saveAs(saveFile, pngSaveOptions, true, Extension.LOWERCASE);
@@ -224,7 +224,7 @@
                     if (saveJPEG)
                     {
                         //Set path to file and file name
-                        saveFile = new File(targetPath + ZoomLevel + "_" + tileX + "_" + tileY + ".jpg");    
+                        saveFile = new File(targetPath + ZoomLevel + "_" + curTileX + "_" + curTileY + ".jpg");    
                         jpegSaveOptions = new JPEGSaveOptions();
                         jpegSaveOptions.formatOpsions = FormatOptions.STANDARDBASELINE;
                         jpegSaveOptions.matte = MatteType.NONE;
@@ -238,7 +238,7 @@
                 revertToSnapshot(curDoc, snapshots[snapshots.length-1]);
 
                 // Move to next tile in column
-                tileY += 1;
+                curTileY += 1;
                 
             }
      
