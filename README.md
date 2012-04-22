@@ -12,8 +12,8 @@ Built by Bramus! - [http://www.bram.us/](http://www.bram.us/)
 
 * Download and extract `PS_Bramus.GoogleMapsTileCutter`
 * Move `PS_Bramus.GoogleMapsTileCutter.jsx` to your Photoshop scripts directory
-** For Photoshop CS5 on Mac OS X this is `/Applications/Adobe Photoshop CS5/Presets/Scripts`
-** For Photoshop CS5 on Windows this is `C:\Program Files\Adobe\Adobe Photoshop CS5\Presets\Scripts`
+* * For Photoshop CS5 on Mac OS X this is `/Applications/Adobe Photoshop CS5/Presets/Scripts`
+* * For Photoshop CS5 on Windows this is `C:\Program Files\Adobe\Adobe Photoshop CS5\Presets\Scripts`
 * Restart Photoshop if it was already running
 
 
@@ -24,8 +24,8 @@ Built by Bramus! - [http://www.bram.us/](http://www.bram.us/)
 * Open Photoshop and open the image you want to process.
 * Access the script from the scripts menu in Photoshop: `File` > `Scripts` > `PS_Bramus.GoogleMapsTileCutter`.
 * The script will start carving the tiles for as many zoom levels as possible.
-** During this phase it will look like Photoshop is going berzerk, this is normal, as it is.
-** Depending on the size of the image it might be a good idea to take coffee break.
+* * During this phase it will look like Photoshop is going berzerk, this is normal, as it is.
+* * Depending on the size of the image it might be a good idea to take coffee break.
 * When the script has finished carving, you will find the tiles on your desktop, in a tilecutter subfolder (~/Desktop/tilecutter)
 
 ### Implementing the tiles
