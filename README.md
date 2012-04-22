@@ -27,13 +27,14 @@ Built by Bramus! - [http://www.bram.us/](http://www.bram.us/)
 * The script will start carving the tiles for as many zoom levels as possible.
 	* During this phase it will look like Photoshop is going berzerk, this is normal, as it is.
 	* Depending on the size of the image it might be a good idea to take coffee break.
-* When the script has finished carving, you will find the tiles on your desktop, in a tilecutter subfolder (~/Desktop/tilecutter)
+* When the script has finished carving, you will find the tiles on your desktop, in a tilecutter subfolder (`~/Desktop/tilecutter`)
 
 ### Implementing the tiles
 
 The resulting tiles can be used directly in Google Maps by setting up [a custom map type](https://developers.google.com/maps/documentation/javascript/maptypes#CustomMapTypes), using [a `google.maps.ImageMapType` instance](https://developers.google.com/maps/documentation/javascript/maptypes#ImageMapTypes)
 
-A fully working example is included in the `examples` directory that came with the download of `PS_Bramus.GoogleMapsTileCutter`. A live example is available at [http://bramus.github.com/photoshop-google-maps-tile-cutter/example/](http://bramus.github.com/photoshop-google-maps-tile-cutter/example/)
+A fully working example is included in the `examples` directory that came with the download of `PS_Bramus.GoogleMapsTileCutter`.
+A live example is available at [http://bramus.github.com/photoshop-google-maps-tile-cutter/example/](http://bramus.github.com/photoshop-google-maps-tile-cutter/example/)
 
 
 ## Notes
@@ -46,4 +47,5 @@ A fully working example is included in the `examples` directory that came with t
 
 ## Credits
 
-`PS_Bramus.GoogleMapsTileCutter` is based upon the [`Automatic Tile Cutter`](http://mapki.com/mediawiki/index.php?title=Automatic_Tile_Cutter#Updated_Script) by [Will James](http://onNYTurf.com), [Curtis Wyatt](http://gocalipso.com/), and [Nate Bundy](http://www.lemonrage.com/). Basically `PS_Bramus.GoogleMapsTileCutter` is an improved, cleaned up version of their work.
+`PS_Bramus.GoogleMapsTileCutter` is based upon the [Automatic Tile Cutter](http://mapki.com/mediawiki/index.php?title=Automatic_Tile_Cutter#Updated_Script) by [Will James](http://onNYTurf.com), [Curtis Wyatt](http://gocalipso.com/), and [Nate Bundy](http://www.lemonrage.com/).
+Basically `PS_Bramus.GoogleMapsTileCutter` is an improved, cleaned up version of their work.
