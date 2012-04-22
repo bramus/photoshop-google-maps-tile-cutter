@@ -34,6 +34,7 @@ Built by Bramus! - [http://www.bram.us/](http://www.bram.us/)
 The resulting tiles can be used directly in Google Maps by setting up [a custom map type](https://developers.google.com/maps/documentation/javascript/maptypes#CustomMapTypes), using [a `google.maps.ImageMapType` instance](https://developers.google.com/maps/documentation/javascript/maptypes#ImageMapTypes)
 
 A fully working example is included in the `examples` directory that came with the download of `PS_Bramus.GoogleMapsTileCutter`.
+
 A live example is available at [http://bramus.github.com/photoshop-google-maps-tile-cutter/example/](http://bramus.github.com/photoshop-google-maps-tile-cutter/example/)
 
 
@@ -48,4 +49,5 @@ A live example is available at [http://bramus.github.com/photoshop-google-maps-t
 ## Credits
 
 `PS_Bramus.GoogleMapsTileCutter` is based upon the [Automatic Tile Cutter](http://mapki.com/mediawiki/index.php?title=Automatic_Tile_Cutter#Updated_Script) by [Will James](http://onNYTurf.com), [Curtis Wyatt](http://gocalipso.com/), and [Nate Bundy](http://www.lemonrage.com/).
+
 Basically `PS_Bramus.GoogleMapsTileCutter` is an improved, cleaned up version of their work.
