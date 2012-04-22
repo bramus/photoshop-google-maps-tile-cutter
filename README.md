@@ -32,7 +32,7 @@ Built by Bramus! - [http://www.bram.us/](http://www.bram.us/)
 
 The resulting tiles can be used directly in Google Maps by setting up [a custom map type](https://developers.google.com/maps/documentation/javascript/maptypes#CustomMapTypes), using [a `google.maps.ImageMapType` instance](https://developers.google.com/maps/documentation/javascript/maptypes#ImageMapTypes)
 
-A fully working example is included in the `examples` directory that came with the download of `PS_Bramus.GoogleMapsTileCutter`.
+A fully working example is included in the `examples` directory that came with the download of `PS_Bramus.GoogleMapsTileCutter`. A live example is available at [http://bramus.github.com/photoshop-google-maps-tile-cutter/example/](http://bramus.github.com/photoshop-google-maps-tile-cutter/example/)
 
 
 ## Notes
