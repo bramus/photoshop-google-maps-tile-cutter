@@ -13,8 +13,8 @@ Built by Bramus! - [http://www.bram.us/](http://www.bram.us/)
 
 * Download and extract `PS_Bramus.GoogleMapsTileCutter`
 * Move `PS_Bramus.GoogleMapsTileCutter.jsx` to your Photoshop scripts directory
-	* For Photoshop CS5 on Mac OS X this is `/Applications/Adobe Photoshop CS5/Presets/Scripts`
-	* For Photoshop CS5 on Windows this is `C:\Program Files\Adobe\Adobe Photoshop CS5\Presets\Scripts`
+	* For Photoshop CS6 on Mac OS X this is `/Applications/Adobe Photoshop CS6/Presets/Scripts`
+	* For Photoshop CS6 on Windows this is `C:\Program Files\Adobe\Adobe Photoshop CS6\Presets\Scripts`
 * Restart Photoshop if it was already running
 
 
