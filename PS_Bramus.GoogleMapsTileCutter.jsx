@@ -226,7 +226,7 @@
                         //Set path to file and file name
                         saveFile = new File(targetPath + ZoomLevel + "_" + curTileX + "_" + curTileY + ".jpg");    
                         jpegSaveOptions = new JPEGSaveOptions();
-                        jpegSaveOptions.formatOpsions = FormatOptions.STANDARDBASELINE;
+                        jpegSaveOptions.formatOptions = FormatOptions.STANDARDBASELINE;
                         jpegSaveOptions.matte = MatteType.NONE;
                         jpegSaveOptions.quality = 5;				
                         curDoc.saveAs(saveFile, jpegSaveOptions, true, Extension.LOWERCASE);
