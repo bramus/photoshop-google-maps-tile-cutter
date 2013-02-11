@@ -3,7 +3,7 @@
  * By Bramus Van Damme - http://www.bram.us/
  *
  * Based upon work by Will James (http://onNYTurf.com), Curtis Wyatt (http://gocalipso.com/), and Nate Bundy (http://www.lemonrage.com/)
- * 
+ *
  */
 
 
@@ -28,15 +28,15 @@
 // **** HELPER FUNCTIONS - DON'T TOUCH!
 
     // Takes a snapshot
-    function takeSnapshot() { 
-       var desc153 = new ActionDescriptor(); 
-       var ref119 = new ActionReference(); 
+    function takeSnapshot() {
+       var desc153 = new ActionDescriptor();
+       var ref119 = new ActionReference();
        ref119.putClass(charIDToTypeID("SnpS")); // Snapshot
-       desc153.putReference(charIDToTypeID("null"), ref119 ); 
-       var ref120 = new ActionReference(); 
+       desc153.putReference(charIDToTypeID("null"), ref119 );
+       var ref120 = new ActionReference();
        ref120.putProperty(charIDToTypeID("HstS"), charIDToTypeID("CrnH") ); // Historystate, CurrentHistorystate
        desc153.putReference(charIDToTypeID("From"), ref120 ); // From Current Historystate
-       executeAction(charIDToTypeID("Mk  "), desc153, DialogModes.NO ); 
+       executeAction(charIDToTypeID("Mk  "), desc153, DialogModes.NO );
     }
 
     // deletes the current active snapshot
@@ -54,15 +54,15 @@
     }
 
     // get id of the last snapshot
-    function getLastSnapshotID(doc) { 
-       var hsObj = doc.historyStates; 
-       var hsLength = hsObj.length; 
-       for (var i = hsLength-1; i > -1; i--) { 
-           if(hsObj[i].snapshot) { 
-               return i; 
+    function getLastSnapshotID(doc) {
+       var hsObj = doc.historyStates;
+       var hsLength = hsObj.length;
+       for (var i = hsLength-1; i > -1; i--) {
+           if(hsObj[i].snapshot) {
+               return i;
                break;
-           }       
-       }       
+           }
+       }
     }
 
     // get all visible layers
@@ -114,7 +114,7 @@
 
     // Active document and folder exists, process it
     else {
-        
+
         // Make sure targetPath exists
         var targetFolder = new Folder(targetPath);
         if (!targetFolder.exists) targetFolder.create();
@@ -138,7 +138,7 @@
 
         // Store initial state
         var InitialSnapshotID = getLastSnapshotID(curDoc);
-        
+
         // keep track of all other snapshots
         var snapshots = [];
 
@@ -147,7 +147,7 @@
         bgColorHex.rgb.hexValue = bgColor;
         app.backgroundColor = bgColorHex;
         curDoc.resizeCanvas(TILE_SIZE * Math.pow(2, maxZoomLevel), TILE_SIZE * Math.pow(2, maxZoomLevel), AnchorPosition.MIDDLECENTER);
-        
+
         // Find the visible layers
         var visibleLayers = getVisibleLayers(curDoc);
 
@@ -157,50 +157,50 @@
         // Do the following for each zoom level the user wants
         while (ZoomLevel >= minZoomLevel)
         {
-        
+
             // Resize the canvas to fit the zoom level (50% per zoom level step)
             if (ZoomLevel < maxZoomLevel) {
                 curDoc.resizeImage(curDoc.width.value * 0.5, curDoc.height.value * 0.5);
             }
-            
+
             // Take a snapshot for this zoom level and store it
             takeSnapshot();
             snapshots.push(getLastSnapshotID(curDoc));
-            
+
             // Calculate the number of tiles we'll need
             var numTilesX = parseInt(curDoc.width.value, 10) / TILE_SIZE; // num tiles on the x axis
             var numTilesY = parseInt(curDoc.height.value, 10) / TILE_SIZE; // num tiles on the y axis
             var numTilesTotal = numTilesX * numTilesY; // total tiles (numTilesX * numTilesY)
-            
+
             // Counters to track which x value and which y value we are on in our image tile grid
             var curTileX = 0;
             var curTileY = 0;
-            
+
             // Cut 'em up
             // For each tile we need to make, we repeat each step in this loop
             for (n = 1; n < numTilesTotal + 1; n++)
-            {            
+            {
                 // We cut up tiles column by column
                 // I.E. we cut up all the tiles for a given x value before moving on to the next x value.
-                // We do this by checking if the y value we are on is the last tile in a column 
+                // We do this by checking if the y value we are on is the last tile in a column
                 // We compare our y counter to our total y number of Tiles, if they are the same is we do the following
                 if (parseInt(curTileY, 10) == parseInt(numTilesY, 10))
-                {   
+                {
                     curTileX += 1; // move to next column
                     curTileY = 0; // start back at the top
                 }
-                
-                // Crop out needed square tile           
+
+                // Crop out needed square tile
                 curDoc.crop(Array(curTileX * TILE_SIZE, curTileY * TILE_SIZE, curTileX * TILE_SIZE + TILE_SIZE, curTileY * TILE_SIZE + TILE_SIZE));
-                
+
                 if (!visibleLayersEmpty(curDoc))
                 {
-                                        
+
                     //Save the file
                     if (saveGIF)
                     {
                         //Set path to file and file name
-                        saveFile = new File(targetPath + ZoomLevel + "_" + curTileX + "_" + curTileY + ".gif");    
+                        saveFile = new File(targetPath + ZoomLevel + "_" + curTileX + "_" + curTileY + ".gif");
                         //Set save options
                         gifSaveOptions = new GIFSaveOptions();
                         gifSaveOptions.colors = 64;
@@ -211,42 +211,42 @@
                         gifSaveOptions.interlaced = 0;
                         curDoc.saveAs(saveFile, gifSaveOptions, true, Extension.LOWERCASE);
                     }
-                
+
                     if (savePNG)
                     {
                         //Set path to file and file name
-                        saveFile = new File(targetPath + ZoomLevel + "_" + curTileX + "_" + curTileY + ".png");    
+                        saveFile = new File(targetPath + ZoomLevel + "_" + curTileX + "_" + curTileY + ".png");
                         pngSaveOptions = new PNGSaveOptions();
                         pngSaveOptions.interlaced = 0;
                         curDoc.saveAs(saveFile, pngSaveOptions, true, Extension.LOWERCASE);
                     }
-                
+
                     if (saveJPEG)
                     {
                         //Set path to file and file name
-                        saveFile = new File(targetPath + ZoomLevel + "_" + curTileX + "_" + curTileY + ".jpg");    
+                        saveFile = new File(targetPath + ZoomLevel + "_" + curTileX + "_" + curTileY + ".jpg");
                         jpegSaveOptions = new JPEGSaveOptions();
                         jpegSaveOptions.formatOptions = FormatOptions.STANDARDBASELINE;
                         jpegSaveOptions.matte = MatteType.NONE;
-                        jpegSaveOptions.quality = 5;				
+                        jpegSaveOptions.quality = 5;
                         curDoc.saveAs(saveFile, jpegSaveOptions, true, Extension.LOWERCASE);
                     }
-                
+
                 }
-            
+
                 // Revert to zoom snapshot
                 revertToSnapshot(curDoc, snapshots[snapshots.length-1]);
 
                 // Move to next tile in column
                 curTileY += 1;
-                
+
             }
-     
+
             // move to next zoom level
             ZoomLevel--;
-            
+
         }
-    
+
         // Loop all snapshots we took and delete them
         do {
             revertToSnapshot(curDoc, snapshots[snapshots.length-1]);
@@ -256,10 +256,10 @@
 
         // Revert to initial state (before we started cutting tiles)
         revertToSnapshot(curDoc, InitialSnapshotID);
-        
+
         // Delete all other states
         app.purge(PurgeTarget.HISTORYCACHES);
-        
+
         // Restore application preferences
         app.preferences.rulerUnits = startRulerUnits;
 

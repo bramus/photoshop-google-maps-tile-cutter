@@ -20,7 +20,7 @@
 		</style>
 	</head>
 	<body>
-		<div id="map">loading tiles...</div>		
+		<div id="map">loading tiles...</div>
 		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
 		<script>
 
@@ -28,21 +28,21 @@
 			 * = Config
 			 * ----------------
 			 */
-			
+
 				var repeatOnXAxis = false; // Do we need to repeat the image on the X-axis? Most likely you'll want to set this to false
 				var blankTilePath = 'tiles/_empty.jpg'; // Path to a blank tile when repeat is set to false
 				var maxZoom = 4; // Maximum zoom level. Set this to the first number of the last tile generated (eg. 5_31_31 -> 5)
-			
-			
+
+
 			/*
 			 * Helper function which normalizes the coords so that tiles can repeat across the X-axis (horizontally) like the standard Google map tiles.
 			 * ----------------
 			 */
-			
+
 				function getNormalizedCoord(coord, zoom) {
-			
+
 					if (!repeatOnXAxis) return coord;
-			
+
 					var y = coord.y;
 					var x = coord.x;
 
@@ -64,7 +64,7 @@
 						x: x,
 						y: y
 					};
-		
+
 				}
 
 
@@ -74,7 +74,7 @@
 			 */
 
 				window.onload = function() {
-				
+
 					// Define our custom map type
 					var customMapType = new google.maps.ImageMapType({
 						getTileUrl: function(coord, zoom) {
@@ -89,7 +89,7 @@
 						maxZoom: maxZoom,
 						name: 'Champagne in the park'
 					});
-			
+
 					// Basic options for our map
 					var myOptions = {
 						center: new google.maps.LatLng(0, 0),
@@ -104,10 +104,10 @@
 
 					// Init the map
 					var map = new google.maps.Map(document.getElementById('map'), myOptions);
-					
+
 					// Hook the our custom map type to the map and activate it
 					map.mapTypes.set('custom', customMapType);
-					map.setMapTypeId('custom');	
+					map.setMapTypeId('custom');
 
 				}
 		</script>
