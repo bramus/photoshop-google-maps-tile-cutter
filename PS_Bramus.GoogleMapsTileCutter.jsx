@@ -4,26 +4,79 @@
  *
  * Based upon work by Will James (http://onNYTurf.com), Curtis Wyatt (http://gocalipso.com/), and Nate Bundy (http://www.lemonrage.com/)
  *
+ * UI by Nick Springer, http://www.springercartographics.com
  */
 
+// **** Options UI
 
+var res =
+"dialog { text:'Google Maps Tile Cutter', alignChildren: 'fill', \
+	exportDirs: Panel { orientation:'column', alignChildren:['left','top'], \
+		grpExport: Group {orientation:'row',alignment:'left', \
+			btnExportPath: Button {text:'Tiles Export Folder...'}, \
+			stExportPath: EditText {text:'',characters:50,enabled:false} }\
+		grpText: Group {orientation:'row',alignment:'left', \
+			lblWarning: StaticText {text:'You must select an export directory to begin',visible:false}}\
+		}\
+	exportOptions: Panel { orientation:'column', alignChildren:['left','top'], \
+		grpFiletype: Group {orientation:'row',alignment:'left', \
+			optJPEG: RadioButton {text:'JPEG tiles',value:true}, \
+			optPNG: RadioButton {text:'PNG tiles'},\
+			optGIF: RadioButton {text:'GIF tiles'}}\
+		grpSize: Group {orientation:'row',alignment:'left', \
+               lblSize: StaticText {text:'Tile Size:'},\
+               strSize: EditText {text:'256',characters:4,enabled:true},\
+               lblBg: StaticText {text:'Background Color:'},\
+               strBg: EditText {text:'"+ app.backgroundColor.rgb.hexValue + "',characters:6,enabled:true}}\
+		}\
+	buttons: Group { orientation: 'row', alignment: 'right', \
+		txtCancel: StaticText { text:'Press ESC to cancel' }, \
+		okBtn: Button { text:'Make Tiles', properties:{name:'ok'}} \
+	} \
+}"
+var win = new Window (res, 'Google Maps Tile Cutter',undefined,{closeButton: false}); 
+win.center(); 
 
+win.exportDirs.grpExport.btnExportPath.onClick = function() {
+		tempFolder = Folder.selectDialog();
+		if(tempFolder != null) {
+			win.exportDirs.grpExport.stExportPath.text = tempFolder.fsName;
+			enableUI();
+			}
+	}
+
+function enableUI() {
+		win.buttons.okBtn.enabled = true;
+		win.exportDirs.grpText.lblWarning.visible = false;
+	}
+
+function disableUI () {
+		win.buttons.okBtn.enabled = false;
+		win.exportDirs.grpText.lblWarning.visible = true;
+	}
+
+win.onShow = function() {
+    if (win.exportDirs.grpExport.stExportPath.text=="") {
+		disableUI ();
+	}
+}
+
+win.buttons.okBtn.onClick = function ()  {
 // **** CONFIG - FEEL FREE TO ADJUST
 
     // path where to save the tiles
-    var targetPath = Folder.desktop + "/tilecutter/"; // be sure to include the trailing slash!
+    var targetPath = win.exportDirs.grpExport.stExportPath.text + "\\"; // be sure to include the trailing slash!
 
     // size of the tiles - default Google Maps size: 256
-    var TILE_SIZE = 256;
+    var TILE_SIZE = +win.exportOptions.grpSize.strSize.text;
 
     // In which format(s) should be save the tiles? - default: jpg only
-    var saveJPEG = true;
-    var savePNG = false;
-    var saveGIF = false;
+    var saveJPEG = win.exportOptions.grpFiletype.optJPEG.value;
+    var savePNG = win.exportOptions.grpFiletype.optPNG.value;
+    var saveGIF = win.exportOptions.grpFiletype.optGIF.value;
 
     // wanted backgroundcolor to fill in the blanks when resizing the image
-    var bgColor = '000000';
-
+    var bgColor = win.exportOptions.grpSize.strBg.text;
 
 // **** HELPER FUNCTIONS - DON'T TOUCH!
 
@@ -262,7 +315,9 @@
 
         // Restore application preferences
         app.preferences.rulerUnits = startRulerUnits;
-
+        win.close();
     }
+}
 
+win.show();
 // EOF
