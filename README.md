@@ -24,6 +24,8 @@ Built by Bramus! - [http://www.bram.us/](http://www.bram.us/)
 
 ### Cutting tiles
 
+An example of the script in action can be viewed at [https://www.youtube.com/watch?v=ZC-4bNHfuPo](https://www.youtube.com/watch?v=ZC-4bNHfuPo)
+
 * Open Photoshop and open the image you want to process.
 * Access the script from the scripts menu in Photoshop: `File` > `Scripts` > `PS_Bramus.GoogleMapsTileCutter`.
 * Set the export path and cutter settings, and press `Make tiles` to start the cutting process.
@@ -50,8 +52,6 @@ A live example is available at [http://bramus.github.io/photoshop-google-maps-ti
 
 ## Credits
 
-`PS_Bramus.GoogleMapsTileCutter` is based upon the [Automatic Tile Cutter](http://mapki.com/mediawiki/index.php?title=Automatic_Tile_Cutter#Updated_Script) by [Will James](http://onNYTurf.com), [Curtis Wyatt](http://gocalipso.com/), and [Nate Bundy](http://www.lemonrage.com/).
+`PS_Bramus.GoogleMapsTileCutter` is based upon the [Automatic Tile Cutter](http://mapki.com/mediawiki/index.php?title=Automatic_Tile_Cutter#Updated_Script) by [Will James](http://onNYTurf.com), [Curtis Wyatt](http://gocalipso.com/), and [Nate Bundy](http://www.lemonrage.com/). The UI Additions were initially provided by [Nick Springer](http://www.springercartographics.com/).
 
 Basically `PS_Bramus.GoogleMapsTileCutter` is an improved, cleaned up version of their work.
-
-The UI Additions were initially provided by [Nick Springer](http://www.springercartographics.com/).
