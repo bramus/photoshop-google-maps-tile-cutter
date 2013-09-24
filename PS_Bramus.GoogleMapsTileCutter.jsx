@@ -67,16 +67,6 @@ function getLastSnapshotID(doc) {
 	}
 }
 
-// get all visible layers
-function getVisibleLayers(doc) {
-	var tempArray = [];
-	for (var i = 0; i < doc.layers.length; i++) {
-		if (doc.layers[i].visible)
-			tempArray.push(i);
-	}
-	return tempArray;
-}
-
 // check if a layer is empty
 function isLayerEmpty(doc, layer) {
 	if (!doc) {
@@ -86,21 +76,6 @@ function isLayerEmpty(doc, layer) {
 		layer = doc.activeLayer;
 	}
 	return parseInt(layer.bounds.toString().replace(/\D/g,""), 10) === 0;
-}
-
-// check if visibile layers are empty
-function visibleLayersEmpty(doc) {
-	var bool = true;
-	if (!doc) {
-		doc = app.activeDocument;
-	}
-	for (var i = 0; i < visibleLayers.length; i++) {
-		bool = isLayerEmpty(doc, doc.layers[visibleLayers[i]]);
-		if (!bool) {
-			return bool;
-		}
-	}
-	return bool;
 }
 
 
@@ -156,9 +131,6 @@ else {
 	app.backgroundColor = bgColorHex;
 	curDoc.resizeCanvas(TILE_SIZE * Math.pow(2, maxZoomLevel), TILE_SIZE * Math.pow(2, maxZoomLevel), AnchorPosition.MIDDLECENTER);
 
-	// Find the visible layers
-	var visibleLayers = getVisibleLayers(curDoc);
-
 	// Store current zoom level
 	var ZoomLevel = maxZoomLevel;
 
@@ -200,7 +172,7 @@ else {
 			// Crop out needed square tile
 			curDoc.crop(Array(curTileX * TILE_SIZE, curTileY * TILE_SIZE, curTileX * TILE_SIZE + TILE_SIZE, curTileY * TILE_SIZE + TILE_SIZE));
 
-			if (saveTransparentTiles || !visibleLayersEmpty(curDoc, visibleLayers)) {
+			if (saveTransparentTiles || !isLayerEmpty(curDoc, curDoc.activeLayer)) {
 
 				//Save the file
 				if (saveGIF) {
