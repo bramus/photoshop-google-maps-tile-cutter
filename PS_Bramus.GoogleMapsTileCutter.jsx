@@ -174,6 +174,9 @@ else {
 
 			if (saveTransparentTiles || !isLayerEmpty(curDoc, curDoc.activeLayer)) {
 
+				// Set the active layer to a background layer so that our bgColor is used as background color
+				curDoc.activeLayer.isBackgroundLayer = true;
+
 				//Save the file
 				if (saveGIF) {
 
