@@ -137,6 +137,13 @@ else {
 	// Store initial state
 	var InitialSnapshotID = getLastSnapshotID(curDoc);
 
+	// Flatten the image (speeds up processing if it were a non-flattened one yet)
+	curDoc.flatten();
+
+	// Unlock the one layer of the flattened image
+	curDoc.activeLayer.isBackgroundLayer = false;
+	curDoc.activeLayer.allLocked = false;
+
 	// keep track of all other snapshots
 	var snapshots = [];
 
