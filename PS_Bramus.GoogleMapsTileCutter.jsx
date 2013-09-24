@@ -16,6 +16,9 @@ var targetPath = Folder.desktop + "/tilecutter/"; // be sure to include the trai
 // size of the tiles - default Google Maps size: 256
 var TILE_SIZE = 256;
 
+// should we save empty (viz. totally transparent) tiles? - default: false
+var saveTransparentTiles = false;
+
 // In which format(s) should be save the tiles? - default: jpg only
 var saveJPEG = true;
 var savePNG = false;
@@ -197,7 +200,7 @@ else {
 			// Crop out needed square tile
 			curDoc.crop(Array(curTileX * TILE_SIZE, curTileY * TILE_SIZE, curTileX * TILE_SIZE + TILE_SIZE, curTileY * TILE_SIZE + TILE_SIZE));
 
-			if (!visibleLayersEmpty(curDoc)) {
+			if (saveTransparentTiles || !visibleLayersEmpty(curDoc, visibleLayers)) {
 
 				//Save the file
 				if (saveGIF) {
