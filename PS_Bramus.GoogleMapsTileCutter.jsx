@@ -65,7 +65,7 @@ function cutTiles(options, tickCallback) {
 	if (!targetFolder.exists) targetFolder.create();
 
 	// Add trailing / to targetPath
-	options.targetPath += ((File.fs == 'Windows') ? '\'' : '/');
+	options.targetPath += ((File.fs == 'Windows') ? '\\' : '/');
 
 	// Make sure we're using pixels
 	var startRulerUnits = app.preferences.rulerUnits;
