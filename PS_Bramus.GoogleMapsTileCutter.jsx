@@ -290,6 +290,147 @@ function cutTiles(options, tickCallback) {
 	// Restore application preferences
 	app.preferences.rulerUnits = startRulerUnits;
 
+	return {
+		numTilesTotalForAllLevels: numTilesTotalForAllLevels,
+		useSubFolders: options.useSubFolders,
+		maxZoomLevel: maxZoomLevel,
+		tileSize: options.tileSize,
+		targetPath: options.targetPath
+	};
+
+}
+
+function createExampleGoogleMapsHtml(options) {
+
+	// create file reference
+	var fileOut	= new File(options.targetPath + 'index.html');
+	fileOut.lineFeed = 'windows'; // We always want \r\n
+
+	// open for write
+	fileOut.open("w", "TEXT", "????");
+
+	// Inject Content
+	fileOut.writeln('<!DOCTYPE html>');
+	fileOut.writeln('<html lang="en">');
+	fileOut.writeln('	<head>');
+	fileOut.writeln('		<title>PS_Bramus.GoogleMapsTileCutter</title>');
+	fileOut.writeln('		<meta charset="utf-8" />');
+	fileOut.writeln('		<style>');
+	fileOut.writeln('			html, body {');
+	fileOut.writeln('				height: 100%;');
+	fileOut.writeln('				margin: 0;');
+	fileOut.writeln('				padding: 0;');
+	fileOut.writeln('			}');
+	fileOut.writeln('			#map {');
+	fileOut.writeln('				width:100%;');
+	fileOut.writeln('				height:100%;');
+	fileOut.writeln('				color: #CCC;');
+	fileOut.writeln('				background: #EFEFEF;');
+	fileOut.writeln('			}');
+	fileOut.writeln('			span.loading {');
+	fileOut.writeln('				display: block;');
+	fileOut.writeln('				text-align: center;');
+	fileOut.writeln('				font: 300 italic 72px/400px "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", sans-serif;');
+	fileOut.writeln('			}');
+	fileOut.writeln('		</style>');
+	fileOut.writeln('	</head>');
+	fileOut.writeln('	<body>');
+	fileOut.writeln('		<div id="map"><span class="loading">loading tiles...</span></div>');
+	fileOut.writeln('		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>');
+	fileOut.writeln('		<script>');
+	fileOut.writeln('');
+	fileOut.writeln('');
+	fileOut.writeln('			/*');
+	fileOut.writeln('			 * = PS_Bramus.GoogleMapsTileCutter Config');
+	fileOut.writeln('			 * ----------------');
+	fileOut.writeln('			 */');
+	fileOut.writeln('');
+	fileOut.writeln('				var repeatOnXAxis = false; // Do we need to repeat the image on the X-axis? Most likely you\'ll want to set this to false');
+	fileOut.writeln('');
+	fileOut.writeln('');
+	fileOut.writeln('');
+	fileOut.writeln('			/*');
+	fileOut.writeln('			 * Helper function which normalizes the coords so that tiles can repeat across the X-axis (horizontally) like the standard Google map tiles.');
+	fileOut.writeln('			 * ----------------');
+	fileOut.writeln('			 */');
+	fileOut.writeln('');
+	fileOut.writeln('				function getNormalizedCoord(coord, zoom) {');
+	fileOut.writeln('					if (!repeatOnXAxis) return coord;');
+	fileOut.writeln('');
+	fileOut.writeln('					var y = coord.y;');
+	fileOut.writeln('					var x = coord.x;');
+	fileOut.writeln('');
+	fileOut.writeln('					// tile range in one direction range is dependent on zoom level');
+	fileOut.writeln('					// 0 = 1 tile, 1 = 2 tiles, 2 = 4 tiles, 3 = 8 tiles, etc');
+	fileOut.writeln('					var tileRange = 1 << zoom;');
+	fileOut.writeln('');
+	fileOut.writeln('					// don\'t repeat across Y-axis (vertically)');
+	fileOut.writeln('					if (y < 0 || y >= tileRange) {');
+	fileOut.writeln('						return null;');
+	fileOut.writeln('					}');
+	fileOut.writeln('');
+	fileOut.writeln('					// repeat across X-axis');
+	fileOut.writeln('					if (x < 0 || x >= tileRange) {');
+	fileOut.writeln('						x = (x % tileRange + tileRange) % tileRange;');
+	fileOut.writeln('					}');
+	fileOut.writeln('');
+	fileOut.writeln('					return {');
+	fileOut.writeln('						x: x,');
+	fileOut.writeln('						y: y');
+	fileOut.writeln('					};');
+	fileOut.writeln('');
+	fileOut.writeln('				}');
+	fileOut.writeln('');
+	fileOut.writeln('');
+	fileOut.writeln('			/*');
+	fileOut.writeln('			 * Main Core');
+	fileOut.writeln('			 * ----------------');
+	fileOut.writeln('			 */');
+	fileOut.writeln('');
+	fileOut.writeln('				window.onload = function() {');
+	fileOut.writeln('');
+	fileOut.writeln('					// Define our custom map type');
+	fileOut.writeln('					var customMapType = new google.maps.ImageMapType({');
+	fileOut.writeln('						getTileUrl: function(coord, zoom) {');
+	fileOut.writeln('							var normalizedCoord = getNormalizedCoord(coord, zoom);');
+	fileOut.writeln('							if(normalizedCoord && (normalizedCoord.x < Math.pow(2, zoom)) && (normalizedCoord.x > -1) && (normalizedCoord.y < Math.pow(2, zoom)) && (normalizedCoord.y > -1)) {');
+	fileOut.writeln('								return zoom + \'' + (options.useSubFolders ? '/' : '_' ) + '\' + normalizedCoord.x + \'' + (options.useSubFolders ? '/' : '_' ) + '\' + normalizedCoord.y + \'.jpg\';');
+	fileOut.writeln('							} else {');
+	fileOut.writeln('								return \'empty.jpg\';');
+	fileOut.writeln('							}');
+	fileOut.writeln('						},');
+	fileOut.writeln('						tileSize: new google.maps.Size(' + options.tileSize + ', ' + options.tileSize + '),');
+	fileOut.writeln('						maxZoom: ' + options.maxZoomLevel + ',');
+	fileOut.writeln('						name: \'PS_Bramus.GoogleMapsTileCutter\'');
+	fileOut.writeln('					});');
+	fileOut.writeln('');
+	fileOut.writeln('					// Basic options for our map');
+	fileOut.writeln('					var myOptions = {');
+	fileOut.writeln('						center: new google.maps.LatLng(0, 0),');
+	fileOut.writeln('						zoom: 2,');
+	fileOut.writeln('						minZoom: 0,');
+	fileOut.writeln('						streetViewControl: false,');
+	fileOut.writeln('						mapTypeControl: false,');
+	fileOut.writeln('						mapTypeControlOptions: {');
+	fileOut.writeln('							mapTypeIds: ["custom"]');
+	fileOut.writeln('						}');
+	fileOut.writeln('					};');
+	fileOut.writeln('');
+	fileOut.writeln('					// Init the map and hook our custom map type to it');
+	fileOut.writeln('					var map = new google.maps.Map(document.getElementById(\'map\'), myOptions);');
+	fileOut.writeln('					map.mapTypes.set(\'custom\', customMapType);');
+	fileOut.writeln('					map.setMapTypeId(\'custom\');');
+	fileOut.writeln('');
+	fileOut.writeln('				}');
+	fileOut.writeln('		</script>');
+	fileOut.writeln('');
+	fileOut.writeln('	</body>');
+	fileOut.writeln('</html>');
+
+	// close the file
+	fileOut.close();
+
+
 }
 
 
@@ -327,6 +468,9 @@ var windowMain = new Window(
 	'			lblExportPath: StaticText { text: "File Structure" },' +
 	'			optNoSubfolders: RadioButton { text: "Don\'t use subfolders (e.g. z_x_y.jpg)", value: true },' +
 	'			optSubfolders: RadioButton { text: "Use subfolders (e.g. z/x/y.jpg)" }' +
+	'		}' +
+	'		grpExportHtml: Group { orientation: "row", alignment: "left",' +
+	'			cbCreateHTML: Checkbox { text: "Create HTML file with example Google Maps implementation", value: true},' +
 	'		}' +
 	'	}' +
 	'	pnlExportOptions: Panel { orientation: "column", alignChildren: ["left", "top"],' +
@@ -384,6 +528,7 @@ windowMain.grpButtons.btnMakeTiles.onClick = function() {
 	var options = {
 		targetPath: windowMain.pnlExportDir.grpExport.txtExportPath.text,
 		useSubFolders: windowMain.pnlExportDir.grpSubfolders.optSubfolders.value,
+		createHtmlFile: windowMain.pnlExportDir.grpExportHtml.cbCreateHTML.value,
 		tileSize: parseInt(windowMain.pnlExportOptions.grpSizeColor.txtSize.text, 10),
 		saveTransparentTiles: true, // !windowMain.pnlExportOptions.grpExportBlanks.cbDontExport.value,
 		saveJPEG: windowMain.pnlExportOptions.grpFiletype.optJPEG.value,
@@ -398,10 +543,15 @@ windowMain.grpButtons.btnMakeTiles.onClick = function() {
 	windowLoading.center(); // Hmmz, this still is a bit off ...
 
 	// Cut the tiles
-	cutTiles(options, function(curTile, totalTiles) {
+	cutResult = cutTiles(options, function(curTile, totalTiles) {
 		windowLoading.txtStatus.text = 'Cutting Tile ' + curTile + '/' + totalTiles + ' (' + Math.floor(curTile / totalTiles * 100) + '%)';
 		// windowLoading.bar.value = parseInt(windowLoading.bar.value, 10) + 1;
 	});
+
+	if (options.createHtmlFile) {
+		windowLoading.txtStatus.text = 'Creating HTML ...';
+		createExampleGoogleMapsHtml(cutResult);
+	}
 
 	// Close the windowMain
 	windowLoading.close();
