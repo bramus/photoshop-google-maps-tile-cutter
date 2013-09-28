@@ -57,6 +57,47 @@ function isLayerEmpty(doc, layer) {
 	return parseInt(layer.bounds.toString().replace(/\D/g,""), 10) === 0;
 }
 
+// Save doc as jpeg file
+function saveDocAsJpeg(doc, fileLocation) {
+
+	//Set path to file and file name
+	var saveFile = new File(fileLocation);
+	var jpegSaveOptions = new JPEGSaveOptions();
+	jpegSaveOptions.formatOptions = FormatOptions.STANDARDBASELINE;
+	jpegSaveOptions.matte = MatteType.NONE;
+	jpegSaveOptions.quality = 5;
+	doc.saveAs(saveFile, jpegSaveOptions, true, Extension.LOWERCASE);
+
+}
+
+// Save doc as gif file
+function saveDocAsGif(doc, fileLocation) {
+
+	//Set path to file and file name
+	var saveFile = new File(fileLocation);
+	//Set save options
+	var gifSaveOptions = new GIFSaveOptions();
+	gifSaveOptions.colors = 64;
+	gifSaveOptions.dither = Dither.NONE;
+	gifSaveOptions.matte = MatteType.NONE;
+	gifSaveOptions.preserveExactColors = 0;
+	gifSaveOptions.transparency = 1;
+	gifSaveOptions.interlaced = 0;
+	doc.saveAs(saveFile, gifSaveOptions, true, Extension.LOWERCASE);
+
+}
+
+// Save doc as png file
+function saveDocAsPng(doc, fileLocation) {
+
+	//Set path to file and file name
+	var saveFile = new File(fileLocation);
+	var pngSaveOptions = new PNGSaveOptions();
+	pngSaveOptions.interlaced = 0;
+	doc.saveAs(saveFile, pngSaveOptions, true, Extension.LOWERCASE);
+
+}
+
 // Cut the active document into tiles using the passed in settings
 function cutTiles(options, tickCallback) {
 
@@ -162,44 +203,13 @@ function cutTiles(options, tickCallback) {
 				// Set the active layer to a background layer so that our bgColor is used as background color
 				curDoc.activeLayer.isBackgroundLayer = true;
 
+				// Define the filename based on the zoomLevel and x/y pair.
+				var baseFileName = options.targetPath + zoomLevel + "_" + curTileX + "_" + curTileY;
+
 				//Save the file
-				if (options.saveGIF) {
-
-					//Set path to file and file name
-					var saveFile = new File(options.targetPath + zoomLevel + "_" + curTileX + "_" + curTileY + ".gif");
-					//Set save options
-					var gifSaveOptions = new GIFSaveOptions();
-					gifSaveOptions.colors = 64;
-					gifSaveOptions.dither = Dither.NONE;
-					gifSaveOptions.matte = MatteType.NONE;
-					gifSaveOptions.preserveExactColors = 0;
-					gifSaveOptions.transparency = 1;
-					gifSaveOptions.interlaced = 0;
-					curDoc.saveAs(saveFile, gifSaveOptions, true, Extension.LOWERCASE);
-
-				}
-
-				if (options.savePNG) {
-
-					//Set path to file and file name
-					var saveFile = new File(options.targetPath + zoomLevel + "_" + curTileX + "_" + curTileY + ".png");
-					var pngSaveOptions = new PNGSaveOptions();
-					pngSaveOptions.interlaced = 0;
-					curDoc.saveAs(saveFile, pngSaveOptions, true, Extension.LOWERCASE);
-
-				}
-
-				if (options.saveJPEG) {
-
-					//Set path to file and file name
-					var saveFile = new File(options.targetPath + zoomLevel + "_" + curTileX + "_" + curTileY + ".jpg");
-					var jpegSaveOptions = new JPEGSaveOptions();
-					jpegSaveOptions.formatOptions = FormatOptions.STANDARDBASELINE;
-					jpegSaveOptions.matte = MatteType.NONE;
-					jpegSaveOptions.quality = 5;
-					curDoc.saveAs(saveFile, jpegSaveOptions, true, Extension.LOWERCASE);
-
-				}
+				if (options.saveGIF) saveDocAsGif(curDoc, baseFileName + ".gif");
+				if (options.savePNG) saveDocAsPng(curDoc, baseFileName + ".png");
+				if (options.saveJPEG) saveDocAsJpeg(curDoc, baseFileName + ".jpg");
 
 			}
 
