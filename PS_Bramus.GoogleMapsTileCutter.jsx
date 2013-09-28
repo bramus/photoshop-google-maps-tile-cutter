@@ -229,6 +229,26 @@ function cutTiles(options, tickCallback) {
 
 	}
 
+	// Create empty.jpg (if needed)
+	if (!options.saveTransparentTiles) {
+
+		// Crop canvas to tilesize
+		curDoc.crop([ 0, 0, options.tileSize, options.tileSize ]);
+
+		// Select entire canvas
+		curDoc.selection.selectAll();
+
+		// Fill selection with selected background color
+		curDoc.selection.fill(bgColorHex);
+
+		// Save image
+		var baseFileName = options.targetPath + "empty";
+		if (options.saveGIF) saveDocAsGif(curDoc, baseFileName + ".gif");
+		if (options.savePNG) saveDocAsPng(curDoc, baseFileName + ".png");
+		if (options.saveJPEG) saveDocAsJpeg(curDoc, baseFileName + ".jpg");
+
+	}
+
 	// Loop all snapshots we took and delete them
 	do {
 		revertToSnapshot(curDoc, snapshots[snapshots.length-1]);
