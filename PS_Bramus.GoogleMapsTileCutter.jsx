@@ -105,8 +105,11 @@ function cutTiles(options, tickCallback) {
 	var targetFolder = new Folder(options.targetPath);
 	if (!targetFolder.exists) targetFolder.create();
 
+	// Define pathDivider
+	var pathDivider = ((File.fs == 'Windows') ? '\\' : '/');
+
 	// Add trailing / to targetPath
-	options.targetPath += ((File.fs == 'Windows') ? '\\' : '/');
+	options.targetPath += pathDivider;
 
 	// Make sure we're using pixels
 	var startRulerUnits = app.preferences.rulerUnits;
@@ -154,6 +157,17 @@ function cutTiles(options, tickCallback) {
 	// Do the following for each zoom level the user wants
 	while (zoomLevel >= minZoomLevel) {
 
+		// Make sure zoomLevel folder exists if exporting with useSubFolders enabled
+		if (options.useSubFolders) {
+
+			var targetFolderZ = new Folder(options.targetPath + zoomLevel + pathDivider);
+			if (!targetFolderZ.exists) targetFolderZ.create();
+
+			var targetFolderZX = new Folder(options.targetPath + zoomLevel + pathDivider + "0" + pathDivider);
+			if (!targetFolderZX.exists) targetFolderZX.create();
+
+		}
+
 		// Resize the canvas to fit the zoom level (50% per zoom level step)
 		if (zoomLevel < maxZoomLevel) {
 			curDoc.resizeImage(curDoc.width.value * 0.5, curDoc.height.value * 0.5);
@@ -186,6 +200,12 @@ function cutTiles(options, tickCallback) {
 			if (parseInt(curTileY, 10) == parseInt(numTilesY, 10)) {
 				curTileX += 1; // move to next column
 				curTileY = 0; // start back at the top
+
+				// Create subfolder if needed
+				if (options.useSubFolders) {
+					var targetFolderZX = new Folder(options.targetPath + zoomLevel + pathDivider + curTileX + pathDivider);
+					if (!targetFolderZX.exists) targetFolderZX.create();
+				}
 			}
 
 			// Crop out needed square tile
@@ -204,7 +224,12 @@ function cutTiles(options, tickCallback) {
 				curDoc.activeLayer.isBackgroundLayer = true;
 
 				// Define the filename based on the zoomLevel and x/y pair.
-				var baseFileName = options.targetPath + zoomLevel + "_" + curTileX + "_" + curTileY;
+				var baseFileName = options.targetPath;
+				if (options.useSubFolders)
+					baseFileName += zoomLevel + pathDivider + curTileX + pathDivider + curTileY;
+				else {
+					baseFileName += zoomLevel + "_" + curTileX + "_" + curTileY;
+				}
 
 				//Save the file
 				if (options.saveGIF) saveDocAsGif(curDoc, baseFileName + ".gif");
@@ -289,12 +314,19 @@ var windowMain = new Window(
 	'dialog {' +
 	'	text:"Google Maps Tile Cutter", alignChildren: "fill",' +
 	'	pnlExportDir: Panel {' +
-	'		text: "EXPORT PATH",' +
+	'		text: "EXPORT OPTIONS",' +
 	'		orientation: "column", alignChildren: ["left", "top"],' +
 	'		grpExport: Group {' +
 	'			orientation: "row", alignment: "left",' +
+	'			lblExportPath: StaticText { text: "Export Path" },' +
 	'			txtExportPath: EditText { text: "", characters: 50, enabled: false },' +
 	'			btnExportPath: Button { text:"Choose" }' +
+	'		}' +
+	'		grpSubfolders: Group {' +
+	'			orientation: "row", alignment: "left",' +
+	'			lblExportPath: StaticText { text: "File Structure" },' +
+	'			optNoSubfolders: RadioButton { text: "Don\'t use subfolders (e.g. z_x_y.jpg)", value: true },' +
+	'			optSubfolders: RadioButton { text: "Use subfolders (e.g. z/x/y.jpg)" }' +
 	'		}' +
 	'	}' +
 	'	pnlExportOptions: Panel { orientation: "column", alignChildren: ["left", "top"],' +
@@ -351,6 +383,7 @@ windowMain.grpButtons.btnMakeTiles.onClick = function() {
 	// Extract the options
 	var options = {
 		targetPath: windowMain.pnlExportDir.grpExport.txtExportPath.text,
+		useSubFolders: windowMain.pnlExportDir.grpSubfolders.optSubfolders.value,
 		tileSize: parseInt(windowMain.pnlExportOptions.grpSizeColor.txtSize.text, 10),
 		saveTransparentTiles: !windowMain.pnlExportOptions.grpExportBlanks.cbDontExport.value,
 		saveJPEG: windowMain.pnlExportOptions.grpFiletype.optJPEG.value,
