@@ -12,15 +12,18 @@
 			#map {
 				width:100%;
 				height:100%;
-				text-align: center;
-				font: 300 italic 72px/400px "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", sans-serif;
 				color: #CCC;
 				background: #EFEFEF;
+			}
+			span.loading {
+				display: block;
+				text-align: center;
+				font: 300 italic 72px/400px "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", sans-serif;
 			}
 		</style>
 	</head>
 	<body>
-		<div id="map">loading tiles...</div>
+		<div id="map"><span class="loading">loading tiles...</span></div>
 		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
 		<script>
 
