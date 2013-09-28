@@ -254,8 +254,8 @@ function cutTiles(options, tickCallback) {
 
 	}
 
-	// Create empty.jpg (if needed)
-	if (!options.saveTransparentTiles) {
+	// ALWAYS Create empty.jpg
+	if (true || !options.saveTransparentTiles) {
 
 		// Crop canvas to tilesize
 		curDoc.crop([ 0, 0, options.tileSize, options.tileSize ]);
@@ -343,9 +343,9 @@ var windowMain = new Window(
 	'			lblBg: StaticText { text: "Background Color:" },' +
 	'			txtBgColor: EditText { text:"' + app.backgroundColor.rgb.hexValue + '", characters: 6, enabled: true }' +
 	'		}' +
-	'		grpExportBlanks: Group { orientation: "row", alignment: "left",' +
-	'			cbDontExport: Checkbox { text: "Don\'t export transparent tiles", value: true},' +
-	'		}' +
+//	'		grpExportBlanks: Group { orientation: "row", alignment: "left",' +
+//	'			cbDontExport: Checkbox { text: "Don\'t export transparent tiles", value: true},' +
+//	'		}' +
 	'	}' +
 	'	grpButtons: Group {' +
 	'		orientation: "row", alignment: "right",' +
@@ -385,7 +385,7 @@ windowMain.grpButtons.btnMakeTiles.onClick = function() {
 		targetPath: windowMain.pnlExportDir.grpExport.txtExportPath.text,
 		useSubFolders: windowMain.pnlExportDir.grpSubfolders.optSubfolders.value,
 		tileSize: parseInt(windowMain.pnlExportOptions.grpSizeColor.txtSize.text, 10),
-		saveTransparentTiles: !windowMain.pnlExportOptions.grpExportBlanks.cbDontExport.value,
+		saveTransparentTiles: true, // !windowMain.pnlExportOptions.grpExportBlanks.cbDontExport.value,
 		saveJPEG: windowMain.pnlExportOptions.grpFiletype.optJPEG.value,
 		savePNG: windowMain.pnlExportOptions.grpFiletype.optPNG.value,
 		saveGIF: windowMain.pnlExportOptions.grpFiletype.optGIF.value,
