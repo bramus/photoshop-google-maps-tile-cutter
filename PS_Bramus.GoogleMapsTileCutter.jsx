@@ -57,6 +57,47 @@ function isLayerEmpty(doc, layer) {
 	return parseInt(layer.bounds.toString().replace(/\D/g,""), 10) === 0;
 }
 
+// Save doc as jpeg file
+function saveDocAsJpeg(doc, fileLocation) {
+
+	//Set path to file and file name
+	var saveFile = new File(fileLocation);
+	var jpegSaveOptions = new JPEGSaveOptions();
+	jpegSaveOptions.formatOptions = FormatOptions.STANDARDBASELINE;
+	jpegSaveOptions.matte = MatteType.NONE;
+	jpegSaveOptions.quality = 5;
+	doc.saveAs(saveFile, jpegSaveOptions, true, Extension.LOWERCASE);
+
+}
+
+// Save doc as gif file
+function saveDocAsGif(doc, fileLocation) {
+
+	//Set path to file and file name
+	var saveFile = new File(fileLocation);
+	//Set save options
+	var gifSaveOptions = new GIFSaveOptions();
+	gifSaveOptions.colors = 64;
+	gifSaveOptions.dither = Dither.NONE;
+	gifSaveOptions.matte = MatteType.NONE;
+	gifSaveOptions.preserveExactColors = 0;
+	gifSaveOptions.transparency = 1;
+	gifSaveOptions.interlaced = 0;
+	doc.saveAs(saveFile, gifSaveOptions, true, Extension.LOWERCASE);
+
+}
+
+// Save doc as png file
+function saveDocAsPng(doc, fileLocation) {
+
+	//Set path to file and file name
+	var saveFile = new File(fileLocation);
+	var pngSaveOptions = new PNGSaveOptions();
+	pngSaveOptions.interlaced = 0;
+	doc.saveAs(saveFile, pngSaveOptions, true, Extension.LOWERCASE);
+
+}
+
 // Cut the active document into tiles using the passed in settings
 function cutTiles(options, tickCallback) {
 
@@ -64,8 +105,11 @@ function cutTiles(options, tickCallback) {
 	var targetFolder = new Folder(options.targetPath);
 	if (!targetFolder.exists) targetFolder.create();
 
+	// Define pathDivider
+	var pathDivider = ((File.fs == 'Windows') ? '\\' : '/');
+
 	// Add trailing / to targetPath
-	options.targetPath += ((File.fs == 'Windows') ? '\\' : '/');
+	options.targetPath += pathDivider;
 
 	// Make sure we're using pixels
 	var startRulerUnits = app.preferences.rulerUnits;
@@ -113,6 +157,17 @@ function cutTiles(options, tickCallback) {
 	// Do the following for each zoom level the user wants
 	while (zoomLevel >= minZoomLevel) {
 
+		// Make sure zoomLevel folder exists if exporting with useSubFolders enabled
+		if (options.useSubFolders) {
+
+			var targetFolderZ = new Folder(options.targetPath + zoomLevel + pathDivider);
+			if (!targetFolderZ.exists) targetFolderZ.create();
+
+			var targetFolderZX = new Folder(options.targetPath + zoomLevel + pathDivider + "0" + pathDivider);
+			if (!targetFolderZX.exists) targetFolderZX.create();
+
+		}
+
 		// Resize the canvas to fit the zoom level (50% per zoom level step)
 		if (zoomLevel < maxZoomLevel) {
 			curDoc.resizeImage(curDoc.width.value * 0.5, curDoc.height.value * 0.5);
@@ -145,6 +200,12 @@ function cutTiles(options, tickCallback) {
 			if (parseInt(curTileY, 10) == parseInt(numTilesY, 10)) {
 				curTileX += 1; // move to next column
 				curTileY = 0; // start back at the top
+
+				// Create subfolder if needed
+				if (options.useSubFolders) {
+					var targetFolderZX = new Folder(options.targetPath + zoomLevel + pathDivider + curTileX + pathDivider);
+					if (!targetFolderZX.exists) targetFolderZX.create();
+				}
 			}
 
 			// Crop out needed square tile
@@ -162,44 +223,18 @@ function cutTiles(options, tickCallback) {
 				// Set the active layer to a background layer so that our bgColor is used as background color
 				curDoc.activeLayer.isBackgroundLayer = true;
 
+				// Define the filename based on the zoomLevel and x/y pair.
+				var baseFileName = options.targetPath;
+				if (options.useSubFolders)
+					baseFileName += zoomLevel + pathDivider + curTileX + pathDivider + curTileY;
+				else {
+					baseFileName += zoomLevel + "_" + curTileX + "_" + curTileY;
+				}
+
 				//Save the file
-				if (options.saveGIF) {
-
-					//Set path to file and file name
-					var saveFile = new File(options.targetPath + zoomLevel + "_" + curTileX + "_" + curTileY + ".gif");
-					//Set save options
-					var gifSaveOptions = new GIFSaveOptions();
-					gifSaveOptions.colors = 64;
-					gifSaveOptions.dither = Dither.NONE;
-					gifSaveOptions.matte = MatteType.NONE;
-					gifSaveOptions.preserveExactColors = 0;
-					gifSaveOptions.transparency = 1;
-					gifSaveOptions.interlaced = 0;
-					curDoc.saveAs(saveFile, gifSaveOptions, true, Extension.LOWERCASE);
-
-				}
-
-				if (options.savePNG) {
-
-					//Set path to file and file name
-					var saveFile = new File(options.targetPath + zoomLevel + "_" + curTileX + "_" + curTileY + ".png");
-					var pngSaveOptions = new PNGSaveOptions();
-					pngSaveOptions.interlaced = 0;
-					curDoc.saveAs(saveFile, pngSaveOptions, true, Extension.LOWERCASE);
-
-				}
-
-				if (options.saveJPEG) {
-
-					//Set path to file and file name
-					var saveFile = new File(options.targetPath + zoomLevel + "_" + curTileX + "_" + curTileY + ".jpg");
-					var jpegSaveOptions = new JPEGSaveOptions();
-					jpegSaveOptions.formatOptions = FormatOptions.STANDARDBASELINE;
-					jpegSaveOptions.matte = MatteType.NONE;
-					jpegSaveOptions.quality = 5;
-					curDoc.saveAs(saveFile, jpegSaveOptions, true, Extension.LOWERCASE);
-
-				}
+				if (options.saveGIF) saveDocAsGif(curDoc, baseFileName + ".gif");
+				if (options.savePNG) saveDocAsPng(curDoc, baseFileName + ".png");
+				if (options.saveJPEG) saveDocAsJpeg(curDoc, baseFileName + ".jpg");
 
 			}
 
@@ -216,6 +251,26 @@ function cutTiles(options, tickCallback) {
 
 		// move to next zoom level
 		zoomLevel--;
+
+	}
+
+	// ALWAYS Create empty.jpg
+	if (true || !options.saveTransparentTiles) {
+
+		// Crop canvas to tilesize
+		curDoc.crop([ 0, 0, options.tileSize, options.tileSize ]);
+
+		// Select entire canvas
+		curDoc.selection.selectAll();
+
+		// Fill selection with selected background color
+		curDoc.selection.fill(bgColorHex);
+
+		// Save image
+		var baseFileName = options.targetPath + "empty";
+		if (options.saveGIF) saveDocAsGif(curDoc, baseFileName + ".gif");
+		if (options.savePNG) saveDocAsPng(curDoc, baseFileName + ".png");
+		if (options.saveJPEG) saveDocAsJpeg(curDoc, baseFileName + ".jpg");
 
 	}
 
@@ -259,12 +314,19 @@ var windowMain = new Window(
 	'dialog {' +
 	'	text:"Google Maps Tile Cutter", alignChildren: "fill",' +
 	'	pnlExportDir: Panel {' +
-	'		text: "EXPORT PATH",' +
+	'		text: "EXPORT OPTIONS",' +
 	'		orientation: "column", alignChildren: ["left", "top"],' +
 	'		grpExport: Group {' +
 	'			orientation: "row", alignment: "left",' +
+	'			lblExportPath: StaticText { text: "Export Path" },' +
 	'			txtExportPath: EditText { text: "", characters: 50, enabled: false },' +
 	'			btnExportPath: Button { text:"Choose" }' +
+	'		}' +
+	'		grpSubfolders: Group {' +
+	'			orientation: "row", alignment: "left",' +
+	'			lblExportPath: StaticText { text: "File Structure" },' +
+	'			optNoSubfolders: RadioButton { text: "Don\'t use subfolders (e.g. z_x_y.jpg)", value: true },' +
+	'			optSubfolders: RadioButton { text: "Use subfolders (e.g. z/x/y.jpg)" }' +
 	'		}' +
 	'	}' +
 	'	pnlExportOptions: Panel { orientation: "column", alignChildren: ["left", "top"],' +
@@ -281,9 +343,9 @@ var windowMain = new Window(
 	'			lblBg: StaticText { text: "Background Color:" },' +
 	'			txtBgColor: EditText { text:"' + app.backgroundColor.rgb.hexValue + '", characters: 6, enabled: true }' +
 	'		}' +
-	'		grpExportBlanks: Group { orientation: "row", alignment: "left",' +
-	'			cbDontExport: Checkbox { text: "Don\'t export transparent tiles", value: true},' +
-	'		}' +
+//	'		grpExportBlanks: Group { orientation: "row", alignment: "left",' +
+//	'			cbDontExport: Checkbox { text: "Don\'t export transparent tiles", value: true},' +
+//	'		}' +
 	'	}' +
 	'	grpButtons: Group {' +
 	'		orientation: "row", alignment: "right",' +
@@ -321,8 +383,9 @@ windowMain.grpButtons.btnMakeTiles.onClick = function() {
 	// Extract the options
 	var options = {
 		targetPath: windowMain.pnlExportDir.grpExport.txtExportPath.text,
+		useSubFolders: windowMain.pnlExportDir.grpSubfolders.optSubfolders.value,
 		tileSize: parseInt(windowMain.pnlExportOptions.grpSizeColor.txtSize.text, 10),
-		saveTransparentTiles: !windowMain.pnlExportOptions.grpExportBlanks.cbDontExport.value,
+		saveTransparentTiles: true, // !windowMain.pnlExportOptions.grpExportBlanks.cbDontExport.value,
 		saveJPEG: windowMain.pnlExportOptions.grpFiletype.optJPEG.value,
 		savePNG: windowMain.pnlExportOptions.grpFiletype.optPNG.value,
 		saveGIF: windowMain.pnlExportOptions.grpFiletype.optGIF.value,
