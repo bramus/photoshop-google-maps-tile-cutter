@@ -300,7 +300,7 @@ function cutTiles(options, tickCallback) {
 
 }
 
-function createExampleGoogleMapsHtml(options) {
+function createExampleGoogleMapsHtml(options, extension) {
 
 	// create file reference
 	var fileOut	= new File(options.targetPath + 'index.html');
@@ -394,9 +394,9 @@ function createExampleGoogleMapsHtml(options) {
 	fileOut.writeln('						getTileUrl: function(coord, zoom) {');
 	fileOut.writeln('							var normalizedCoord = getNormalizedCoord(coord, zoom);');
 	fileOut.writeln('							if(normalizedCoord && (normalizedCoord.x < Math.pow(2, zoom)) && (normalizedCoord.x > -1) && (normalizedCoord.y < Math.pow(2, zoom)) && (normalizedCoord.y > -1)) {');
-	fileOut.writeln('								return zoom + \'' + (options.useSubFolders ? '/' : '_' ) + '\' + normalizedCoord.x + \'' + (options.useSubFolders ? '/' : '_' ) + '\' + normalizedCoord.y + \'.jpg\';');
+	fileOut.writeln('								return zoom + \'' + (options.useSubFolders ? '/' : '_' ) + '\' + normalizedCoord.x + \'' + (options.useSubFolders ? '/' : '_' ) + '\' + normalizedCoord.y + \'.' + extension + '\';');
 	fileOut.writeln('							} else {');
-	fileOut.writeln('								return \'empty.jpg\';');
+	fileOut.writeln('								return \'empty.' + extension + '\';');
 	fileOut.writeln('							}');
 	fileOut.writeln('						},');
 	fileOut.writeln('						tileSize: new google.maps.Size(' + options.tileSize + ', ' + options.tileSize + '),');
@@ -550,7 +550,14 @@ windowMain.grpButtons.btnMakeTiles.onClick = function() {
 
 	if (options.createHtmlFile) {
 		windowLoading.txtStatus.text = 'Creating HTML ...';
-		createExampleGoogleMapsHtml(cutResult);
+
+		// Define extension
+		var extension;
+		if (options.saveGIF) extension = 'gif';
+		else if (options.savePNG) extension = 'png';
+		else if (options.saveJPEG) extension = 'jpg';
+
+		createExampleGoogleMapsHtml(cutResult, extension);
 	}
 
 	// Close the windowMain
